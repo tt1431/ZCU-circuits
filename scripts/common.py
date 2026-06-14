@@ -2,8 +2,11 @@
 ZCU 电路笔记 — 通用绘图配置
 """
 
-import matplotlib.pyplot as plt
 import matplotlib
+matplotlib.use("Agg")  # 非交互后端，必须最先设置
+
+import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties, findfont
 import os
 
 # ── 路径 ──
@@ -11,25 +14,30 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 IMAGES_DIR = os.path.join(SCRIPT_DIR, "..", "images")
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
-# ── 中文字体 ──
+# ── 中文字体 (全局配置) ──
+_CJK_FONT_PATH = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+_CJK_FONT = FontProperties(fname=_CJK_FONT_PATH)
+_CJK_FONT_NAME = "Noto Sans CJK JP"
+
+# 配置 matplotlibrc
+matplotlib.rcParams.update({
+    "font.family": "sans-serif",
+    "font.sans-serif": [_CJK_FONT_NAME, "DejaVu Sans"],
+    "axes.unicode_minus": False,
+})
+
+# 确保在 rcParams 已改后重建字体缓存
+matplotlib.font_manager._load_fontmanager(try_read_cache=False)
+
+
+def get_font(size=10):
+    """返回中文字体 FontProperties 对象"""
+    return FontProperties(fname=_CJK_FONT_PATH, size=size)
+
+
 def setup_chinese_font():
-    """配置中文字体（优先选用系统常见中文字体）"""
-    candidates = [
-        "WenQuanYi Micro Hei",
-        "Noto Sans CJK SC",
-        "Noto Sans SC",
-        "SimHei",
-        "Microsoft YaHei",
-        "DejaVu Sans",  # fallback
-    ]
-    for name in candidates:
-        try:
-            matplotlib.font_manager.findfont(name, fallback_to_default=False)
-            plt.rcParams["font.sans-serif"] = [name]
-            break
-        except Exception:
-            continue
-    plt.rcParams["axes.unicode_minus"] = False
+    """兼容旧调用——已经在上方全局设置过了"""
+    pass
 
 
 # ── matplotlib 全局样式 ──
@@ -43,14 +51,13 @@ def set_mpl_style():
         "grid.alpha": 0.3,
         "grid.linestyle": "--",
     })
-    setup_chinese_font()
 
 
 # ── schemdraw 通用配置 ──
 def setup_schemdraw():
     """返回基本的 schemdraw 配置"""
     import schemdraw
-    schemdraw.use("svg")  # 使用 SVG 后端保证清晰度
+    schemdraw.use("svg")
     return schemdraw
 
 
