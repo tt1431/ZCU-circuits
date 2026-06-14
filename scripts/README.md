@@ -1,23 +1,29 @@
-# 绘图脚本
+# ZCU 绘图脚本
 
-每个电路对应一个脚本，统一输出到上级 `images/` 目录。
+所有电路图用 Python 生成，保证可复现、可修改。
 
-## 环境
+## 依赖
 
 ```bash
-pip install schemdraw matplotlib numpy
+pip install matplotlib schemdraw numpy
 ```
 
-## 脚本命名
+## 脚本说明
 
-- `circuit_01_schematic.py` — 原理图
-- `circuit_01_waveform.py` — 波形图
-- `circuit_01_block.py` — 框图/流程图
+| 脚本 | 输出 |
+|:--|:--|
+| `common.py` | 通用配置（字体、路径、保存函数） |
+| `circuit_01_schematic.py` | 电路 01 全部 5 张图 |
 
-## 通用配置
+## 生成方式
 
-所有脚本使用统一主题：
+```bash
+python3 circuit_01_schematic.py
+```
 
-- 中文字体：`WenQuanYi Micro Hei` 或 `Noto Sans CJK SC`
-- 尺寸：图幅宽度 1920px，DPI 150
-- 配色：深色标注 + 明亮的信号线
+输出在 `../images/` 目录。
+
+## 工具选择
+
+- **schemdraw** — 电路原理图（三极管、电阻、电容等标准符号）
+- **matplotlib** — 时序图、框图、需要中文标注的复杂图

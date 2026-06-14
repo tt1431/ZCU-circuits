@@ -1,33 +1,39 @@
-# ZCU 项目电路笔记
+# ZCU 电路笔记
 
-> **项目**：ZCU（区域控制单元）电路分析
-> **作者**：谭天
-> **用途**：实习总结 + 秋招备战
+ZCU（区域控制单元）电路分析笔记 —— 从原理到面试，一份搞定。
 
-## 目录
+## 📂 目录
 
-| # | 电路模块 | 笔记 | 状态 |
-|:-:|:--|:--|:--:|
-| 1 | UBD1 电源检测 | [circuit_01_ubd1_power_detection.md](circuits/circuit_01_ubd1_power_detection.md) | ✅ 完成 |
-| 2 | — | — | ⏳ 待添加 |
+| 编号 | 名称 | 核心架构 |
+|:--|:--|:--|
+| 01 | [UBD1 双三极管电子开关](circuits/circuit_01_ubd1_power_detection.md) | PNP+NPN 级联 |
 
-> 电路图由你拍摄 → 我整理笔记 + Python 重新绘制原理图 + 生成知识配图。
+## 📐 图例
 
-## 每篇笔记结构
+所有原理图/时序图/框图均由 Python 生成（schemdraw + matplotlib），源码在 `scripts/` 目录。
 
-每篇电路笔记包含以下模块：
+### 电路 01 — 配图清单
 
-1. **电路功能** — 这个电路是干什么的，在 ZCU 里起什么作用
-2. **选型要求** — 关键元器件的选型依据、参数计算、为什么选这个型号
-3. **适用范围** — 哪些场景下会用到，有什么限制
-4. **调试实践** — 实际调试中遇到的问题、排查思路、解决方法
-5. **实测波形** — 示波器抓到的真实波形与解读
-6. **秋招价值** — 作为一个研究生，这个电路在面试中能怎么聊、能体现什么能力
+| 图 | 内容 | 工具 |
+|:--|:--|:--|
+| `circuit_01_full_schematic.png` | 完整电路原理图 | schemdraw |
+| `circuit_01_switch_core.png` | 电子开关核心（PNP+NPN级联） | matplotlib |
+| `circuit_01_divider.png` | 分压网络 + RC滤波 | schemdraw |
+| `circuit_01_timing.png` | 控制信号时序图 | matplotlib |
+| `circuit_01_block.png` | 系统框图 | matplotlib |
 
-## 配图说明
+## 🛠 使用方式
 
-- **电路原理图** → 用 `schemdraw` (Python) 重新绘制
-- **时序/波形图** → 用 `matplotlib` 绘制
-- **框图/流程图** → 用 `matplotlib` 或 `schemdraw` 绘制
+```bash
+# 生成全部电路图
+cd scripts
+python3 circuit_01_schematic.py
+```
 
-所有绘图脚本在 `scripts/` 目录下，每个电路对应一个独立脚本。
+## 📝 模板
+
+新电路笔记请用 [TEMPLATE.md](TEMPLATE.md)。
+
+---
+
+> 📅 2026-06 | 经纬恒润 ZCU 项目
