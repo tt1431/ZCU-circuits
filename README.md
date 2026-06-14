@@ -7,6 +7,7 @@ ZCU（区域控制单元）电路分析笔记 —— 从原理到面试，一份
 | 编号 | 名称 |
 |:--|:--|
 | 01 | [UBD1 双三极管电子开关](circuits/circuit_01_ubd1_power_detection.md) |
+| 02 | [USB 轮询控制电路](circuits/circuit_02_usb_polling.md) |
 
 ## 📐 配图
 
