@@ -136,192 +136,126 @@ print("✅ 图2 完成\n")
 
 
 # ═══════════════════════════════════════════════════════
-# 图 3：电子开关核心（matplotlib 手绘，精确定位）
+# 图 3：电子开关核心 — matplotlib 手绘精简版
 # ═══════════════════════════════════════════════════════
-print("图 3：电子开关核心（matplotlib）")
+print("图 3：电子开关核心（matplotlib 精简）")
 
-fig3, ax3 = plt.subplots(1, 1, figsize=(10, 7.5))
-ax3.set_xlim(-1, 12)
-ax3.set_ylim(-1, 9)
+fig3, ax3 = plt.subplots(1, 1, figsize=(8, 6))
+ax3.set_xlim(-1, 10)
+ax3.set_ylim(-1, 8)
 ax3.axis("off")
 
-font = get_font(9)
-font_sm = get_font(8)
-font_lg = get_font(11)
+font9 = get_font(9)
+font10 = get_font(10)
 
-# Helper functions for drawing components
-def draw_pnp(ax, x, y, size=0.5):
-    """Draw PNP symbol: emitter=top, collector=bottom, base=left."""
-    r = size * 0.9
-    circle = plt.Circle((x, y), r, fill=False, edgecolor="#222", linewidth=2.0)
-    ax.add_patch(circle)
-    # Vertical line through center
-    ax.plot([x, x], [y-r, y+r], color="#222", linewidth=2.0)
-    # Emitter arrow (top, pointing IN/up)
-    arrow_y = y + r - r*0.5
-    ax.plot([x-r*0.3, x], [arrow_y, arrow_y-r*0.25], color="#222", linewidth=2.5)
-    ax.plot([x+r*0.3, x], [arrow_y, arrow_y-r*0.25], color="#222", linewidth=2.5)
-    # Base line (left)
-    ax.plot([x-r, x-r+r*0.4], [y, y], color="#222", linewidth=2.0)
-    return {"x": x, "y": y, "emitter": (x, y+r), "collector": (x, y-r), "base": (x-r, y)}
+# ── NPN (bottom-left) ──
+nx, ny = 2.5, 2.0
+r = 0.5
+# circle
+ax3.add_patch(plt.Circle((nx, ny), r, fill=False, edgecolor="#222", lw=2))
+# vertical bar
+ax3.plot([nx, nx], [ny-r, ny+r], color="#222", lw=2)
+# emitter arrow (bottom, outward)
+ey = ny - r + r*0.5
+ax3.plot([nx-r*0.3, nx], [ey, ey+r*0.25], color="#222", lw=2.5)
+ax3.plot([nx+r*0.3, nx], [ey, ey+r*0.25], color="#222", lw=2.5)
+# base line (left)
+ax3.plot([nx-r, nx-r+r*0.5], [ny, ny], color="#222", lw=2)
+# label
+ax3.text(nx, ny-0.9, "Q3001\n(NPN)", fontsize=9, ha="center", va="top", fontproperties=font9)
 
-def draw_npn(ax, x, y, size=0.5):
-    """Draw NPN symbol: collector=top, emitter=bottom, base=left."""
-    r = size * 0.9
-    circle = plt.Circle((x, y), r, fill=False, edgecolor="#222", linewidth=2.0)
-    ax.add_patch(circle)
-    ax.plot([x, x], [y-r, y+r], color="#222", linewidth=2.0)
-    # Emitter arrow (bottom, pointing OUT/down)
-    arrow_y = y - r + r*0.5
-    ax.plot([x-r*0.3, x], [arrow_y, arrow_y+r*0.25], color="#222", linewidth=2.5)
-    ax.plot([x+r*0.3, x], [arrow_y, arrow_y+r*0.25], color="#222", linewidth=2.5)
-    # Base line (left)
-    ax.plot([x-r, x-r+r*0.4], [y, y], color="#222", linewidth=2.0)
-    return {"x": x, "y": y, "collector": (x, y+r), "emitter": (x, y-r), "base": (x-r, y)}
+# ── PNP (top-right) ──
+px, py = 6.5, 5.5
+ax3.add_patch(plt.Circle((px, py), r, fill=False, edgecolor="#222", lw=2))
+ax3.plot([px, px], [py-r, py+r], color="#222", lw=2)
+# emitter arrow (top, inward)
+ey = py + r - r*0.5
+ax3.plot([px-r*0.3, px], [ey, ey-r*0.25], color="#222", lw=2.5)
+ax3.plot([px+r*0.3, px], [ey, ey-r*0.25], color="#222", lw=2.5)
+# base line (left)
+ax3.plot([px-r, px-r+r*0.5], [py, py], color="#222", lw=2)
+# label
+ax3.text(px, py-0.9, "Q3001\n(PNP)", fontsize=9, ha="center", va="top", fontproperties=font9)
 
-def draw_res(ax, x1, y1, x2, y2, label="", label_loc="top", fsize=9, fp=None):
-    """Draw resistor as zigzag."""
-    length = x2 - x1 if x2 != x1 else y2 - y1
-    n = 4
-    seg = length / (2*n + 1)
-    xs, ys = [x1], [y1]
-    if x2 != x1:
-        for i in range(n):
-            xs.append(x1 + seg*(2*i+1))
-            ys.append(y1 - 0.12 if i%2==0 else y1 + 0.12)
-            xs.append(x1 + seg*(2*i+2))
-            ys.append(y1)
-    else:
-        for i in range(n):
-            ys.append(y1 + seg*(2*i+1))
-            xs.append(x1 - 0.12 if i%2==0 else x1 + 0.12)
-            ys.append(y1 + seg*(2*i+2))
-            xs.append(x1)
-    ax.plot(xs, ys, color="#222", linewidth=1.8)
-    if label and fp:
-        midx, midy = (x1+x2)/2, (y1+y2)/2
-        if label_loc == "top":
-            ax.text(midx, midy+0.2, label, fontsize=fsize, ha="center", va="bottom", fontproperties=fp)
-        elif label_loc == "right":
-            ax.text(midx+0.2, midy, label, fontsize=fsize, ha="left", va="center", fontproperties=fp)
-
-def draw_gnd(ax, x, y):
-    ax.plot([x, x], [y, y-0.15], color="#222", linewidth=1.5)
-    ax.plot([x-0.25, x+0.25], [y-0.15, y-0.15], color="#222", linewidth=1.5)
-    ax.plot([x-0.15, x+0.15], [y-0.28, y-0.28], color="#222", linewidth=1.5)
-    ax.plot([x-0.06, x+0.06], [y-0.41, y-0.41], color="#222", linewidth=1.5)
-
-def draw_dot(ax, x, y, label="", label_loc="right", fsize=9, fp=None, color="#333"):
-    ax.plot(x, y, 'o', color="#222", markersize=6, zorder=5, markerfacecolor="#222")
-    if label and fp:
-        if label_loc == "right":
-            ax.text(x+0.2, y, label, fontsize=fsize, va="center", fontproperties=fp, color=color)
-        elif label_loc == "left":
-            ax.text(x-0.2, y, label, fontsize=fsize, va="center", ha="right", fontproperties=fp, color=color)
-        elif label_loc == "top":
-            ax.text(x, y+0.2, label, fontsize=fsize, ha="center", va="bottom", fontproperties=fp, color=color)
-
-def line(ax, x1, y1, x2, y2, style="-"):
-    ax.plot([x1, x2], [y1, y2], color="#222", linewidth=1.8, linestyle=style)
-
-# ═══ Layout ═══
-# NPN at bottom-left, PNP at top-right
-npn_x, npn_y = 3.0, 2.5
-pnp_x, pnp_y = 7.0, 6.5
-
-# ── NPN transistor ──
-npn = draw_npn(ax3, npn_x, npn_y, size=0.55)
-ax3.text(npn_x+0.7, npn_y, "Q3001\n(NPN)\n驱动级", fontsize=9, va="center", fontproperties=font, color="#333")
-
+# ── Connections ──
 # NPN base ← DO_UBCTRL
-nbase = npn["base"]
-line(ax3, nbase[0], nbase[1], nbase[0]-1.5, nbase[1])
-draw_dot(ax3, nbase[0]-1.5, nbase[1], "DO_UBCTRL\n(MCU P02.11)", "left", 10, font_lg, "#1565C0")
+ax3.plot([nx-r, 0.5], [ny, ny], color="#222", lw=1.8)
+ax3.plot(0.5, ny, 'o', color="#222", markersize=5, zorder=5, markerfacecolor="#222")
+ax3.text(0.3, ny, "DO_UBCTRL\n(P02.11)", fontsize=9, ha="right", va="center", fontproperties=font9, color="#1565C0")
+
+# R3806: NPN base → down → GND
+rx = nx - r*0.5
+ax3.plot([rx, rx], [ny, ny-0.8], color="#222", lw=1.8)
+# zigzag resistor
+nz = 4; seg = 1.2/(2*nz+1); xs=[rx]; ys=[ny-0.8]
+for i in range(nz):
+    ys.append(ny-0.8 - seg*(2*i+1))
+    xs.append(rx - 0.12 if i%2==0 else rx + 0.12)
+    ys.append(ny-0.8 - seg*(2*i+2))
+    xs.append(rx)
+ax3.plot(xs, ys, color="#222", lw=1.8)
+# ground
+gy = ny-0.8-1.2
+ax3.plot([rx, rx], [gy, gy-0.15], color="#222", lw=1.5)
+for i, (ll, lr) in enumerate([(0.25,0.25),(0.15,0.15),(0.06,0.06)]):
+    ax3.plot([rx-ll, rx+lr], [gy-0.15-i*0.13, gy-0.15-i*0.13], color="#222", lw=1.5)
+ax3.text(rx+0.3, ny-0.8-0.6, "R3806\n4.7K", fontsize=8, ha="left", va="center", fontproperties=get_font(8))
+
+# Link NPN base to R3806 top
+ax3.plot([nx-r+0.1, rx], [ny, ny], color="#222", lw=1.2)
 
 # NPN emitter → GND
-nem = npn["emitter"]
-line(ax3, nem[0], nem[1], nem[0], nem[1]-0.6)
-draw_gnd(ax3, nem[0], nem[1]-0.6)
+ax3.plot([nx, nx], [ny-r, 0.5], color="#222", lw=1.8)
+ax3.plot([nx-0.25, nx+0.25], [0.5, 0.5], color="#222", lw=1.5)
+ax3.plot([nx-0.15, nx+0.15], [0.37, 0.37], color="#222", lw=1.5)
+ax3.plot([nx-0.06, nx+0.06], [0.24, 0.24], color="#222", lw=1.5)
 
-# R3806 pull-down from NPN base to GND
-r3806_x = nbase[0] + 0.15
-draw_res(ax3, r3806_x, nbase[1], r3806_x, 0.3, "R3806\n4.7K", "right", 8, font_sm)
-draw_gnd(ax3, r3806_x, 0.3)
-# Wire from base to R3806 top
-ax3.plot([nbase[0], r3806_x], [nbase[1], nbase[1]], color="#222", linewidth=1.2)
+# NPN collector → up → right → R3000
+top_y = ny + r + 0.6
+ax3.plot([nx, nx], [ny+r, top_y], color="#222", lw=1.8)
+ax3.plot([nx, nx+1.0], [top_y, top_y], color="#222", lw=1.8)
+# R3000 zigzag
+nz = 4; seg = 2.6/(2*nz+1); xs=[nx+1.0]; ys=[top_y]
+for i in range(nz):
+    xs.append(nx+1.0 + seg*(2*i+1))
+    ys.append(top_y - 0.12 if i%2==0 else top_y + 0.12)
+    xs.append(nx+1.0 + seg*(2*i+2))
+    ys.append(top_y)
+ax3.plot(xs, ys, color="#222", lw=1.8)
+ax3.text(nx+1.0+1.3, top_y+0.25, "R3000 10K", fontsize=9, ha="center", fontproperties=font9)
 
-# NPN collector → up → R3000 → right → up to PNP base
-ncol = npn["collector"]
-line(ax3, ncol[0], ncol[1], ncol[0], ncol[1]+0.4)
-line(ax3, ncol[0], ncol[1]+0.4, ncol[0]+0.8, ncol[1]+0.4)
-draw_res(ax3, ncol[0]+0.8, ncol[1]+0.4, ncol[0]+3.2, ncol[1]+0.4, "R3000 10K", "top", 10, font)
-line(ax3, ncol[0]+3.2, ncol[1]+0.4, ncol[0]+3.2, pnp_y)
-
-# ── PNP transistor ──
-pnp = draw_pnp(ax3, pnp_x, pnp_y, size=0.55)
-ax3.text(pnp_x+0.7, pnp_y, "Q3001\n(PNP)\n功率级", fontsize=9, va="center", fontproperties=font, color="#333")
-
-# Connect R3000 → PNP base (NPN collector through R3000 to PNP base)
-pbase = pnp["base"]
-# The wire from R3000 comes from below to pnp_y at x=ncol[0]+3.2
-# PNP base is at x=pnp_x-r (r≈0.495) = pnp_x-0.495 ≈ 6.505
-# ncol[0]+3.2 = npn_x + 3.2 = 3.0 + 3.2 = 6.2
-# So: (6.2, pnp_y) → draw wire to (6.505, pnp_y)
-line(ax3, ncol[0]+3.2, pnp_y, pbase[0], pnp_y)
-# Also need a dot at the connection
-ax3.plot(pbase[0], pnp_y, 'o', color="#222", markersize=5, zorder=5, markerfacecolor="#222")
+# R3000 → PNP base
+ax3.plot([nx+1.0+2.6, px-r], [top_y, top_y], color="#222", lw=1.8)
+ax3.plot([px-r, top_y+0.3], [px-r, py], color="#222", lw=1.8)
+ax3.plot(px-r, py, 'o', color="#222", markersize=5, zorder=5, markerfacecolor="#222")
 
 # PNP emitter → UBD1
-pem = pnp["emitter"]
-line(ax3, pem[0], pem[1], pem[0], pem[1]+0.7)
-draw_dot(ax3, pem[0], pem[1]+0.7, "UBD1\n(被监测电源)", "top", 10, font_lg, "#C62828")
+ax3.plot([px, px], [py+r, py+r+0.7], color="#222", lw=1.8)
+ax3.plot(px, py+r+0.7, 'o', color="#222", markersize=5, zorder=5, markerfacecolor="#222")
+ax3.text(px, py+r+0.9, "UBD1\n(电源输入)", fontsize=10, ha="center", va="bottom", fontproperties=font10)
 
-# TP3005
-draw_dot(ax3, pem[0]+0.6, pem[1]+0.7, "TP3005", "right", 8, font_sm, "gray")
-line(ax3, pem[0], pem[1]+0.7, pem[0]+0.6, pem[1]+0.7)
+# TP3005 stub
+ax3.plot([px, px+1.0], [py+r+0.3, py+r+0.3], color="gray", lw=1.2, linestyle="--")
+ax3.plot(px+1.0, py+r+0.3, 'o', color="gray", markersize=4, zorder=5, markerfacecolor="gray")
+ax3.text(px+1.1, py+r+0.3, "TP3005", fontsize=7, va="center", fontproperties=get_font(7), color="gray")
 
 # PNP collector → Vout
-pcol = pnp["collector"]
-line(ax3, pcol[0], pcol[1], pcol[0], pcol[1]-0.7)
-draw_dot(ax3, pcol[0], pcol[1]-0.7, "Vout\n→ 分压/ADC", "right", 10, font_lg, "#E65100")
+ax3.plot([px, px], [py-r, py-r-0.7], color="#222", lw=1.8)
+ax3.plot(px, py-r-0.7, 'o', color="#222", markersize=5, zorder=5, markerfacecolor="#222")
+ax3.text(px, py-r-0.9, "Vout\n→ 分压/ADC", fontsize=9, ha="center", va="top", fontproperties=font9, color="#E65100")
 
-# ── State annotations ──
-# Control path
-ax3.annotate("① MCU输出H\n→ NPN基极高", xy=(nbase[0]-0.8, nbase[1]+0.3),
-            fontsize=8, fontproperties=font_sm, color="#1565C0",
-            bbox=dict(boxstyle="round,pad=0.2", facecolor="#E3F2FD", alpha=0.8))
+# ── Role labels ──
+ax3.text(nx+0.8, ny+r+0.3, "驱动级", fontsize=9, ha="center", fontproperties=font9, color="#2E7D32")
+ax3.text(px+0.8, py+r+0.3, "功率开关", fontsize=9, ha="center", fontproperties=font9, color="#C62828")
 
-# NPN ON effect
-ax3.annotate("② NPN导通\n集电极≈0V", xy=(npn_x+0.8, npn_y+0.3),
-            fontsize=8, fontproperties=font_sm, color="#2E7D32",
-            bbox=dict(boxstyle="round,pad=0.2", facecolor="#E8F5E9", alpha=0.8))
+# ── Switch logic at bottom ──
+ax3.text(4.5, 0.5,
+         "开关逻辑：DO_UBCTRL=H → NPN导通 → PNP基极拉低 → PNP导通 → UBD1输出\n"
+         "  DO_UBCTRL=L → NPN截止 → PNP基极浮高 → PNP截止 → 不耗电",
+         fontsize=8.5, ha="center", fontproperties=font9,
+         bbox=dict(boxstyle="round,pad=0.4", facecolor="#F8F8F8", edgecolor="#CCC", alpha=0.9))
 
-# R3000 effect
-ax3.annotate("③ 通过R3000\n拉低PNP基极", xy=(ncol[0]+1.8, ncol[1]+0.9),
-            fontsize=8, fontproperties=font_sm, color="#7B1FA2",
-            bbox=dict(boxstyle="round,pad=0.2", facecolor="#F3E5F5", alpha=0.8))
-
-# PNP ON effect
-ax3.annotate("④ PNP导通\n发射极=UBD1\n集电极输出", xy=(pnp_x+0.8, pnp_y+0.3),
-            fontsize=8, fontproperties=font_sm, color="#E65100",
-            bbox=dict(boxstyle="round,pad=0.2", facecolor="#FBE9E7", alpha=0.8))
-
-# Switch logic summary at bottom
-ax3.text(5, 1.0,
-         "电子开关工作逻辑：\n"
-         "DO_UBCTRL = H → NPN导通 → NPN集电极≈0V → R3000拉低PNP基极 →\n"
-         "PNP导通(U_EB ≈ UBD1) → 集电极输出 ≈ UBD1 → 后续分压\n"
-         "DO_UBCTRL = L → NPN截止 → PNP基极高 → PNP截止 → 不耗电",
-         fontsize=9, ha="center", fontproperties=font,
-         bbox=dict(boxstyle="round,pad=0.5", facecolor="#F5F5F5", edgecolor="#999", alpha=0.9),
-         va="center", linespacing=2.0)
-
-# R3806 annotation
-ax3.annotate("R3806 下拉\n防浮空误导通", xy=(r3806_x+0.5, 1.5),
-            fontsize=8, fontproperties=font_sm, color="#888",
-            bbox=dict(boxstyle="round,pad=0.2", facecolor="#FFFDE7", alpha=0.8))
-
-fig3.suptitle("电子开关核心：双三极管（PNP+NPN）级联结构", fontsize=13, fontweight="bold", y=1.01)
+fig3.suptitle("电子开关核心：双三极管（PNP+NPN）级联", fontsize=12, fontweight="bold", y=1.01)
 fig3.tight_layout()
 savefig(fig3, "circuit_01_switch_core.png")
 print("✅ 图3 完成\n")

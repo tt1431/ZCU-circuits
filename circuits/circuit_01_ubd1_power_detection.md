@@ -65,7 +65,7 @@ DO_UBCTRL = L (0V)
 
 ### 完整电路
 
-![完整原理图](images/circuit_01_full_schematic.png)
+![完整原理图](../images/circuit_01_full_schematic.png)
 
 **信号路径**：UBD1 → PNP 发射极 → PNP 集电极 → R3005/R3010 分压 → C3001 滤波 → MCU ADC
 
@@ -73,11 +73,11 @@ DO_UBCTRL = L (0V)
 
 ### 电子开关核心
 
-![电子开关核心](images/circuit_01_switch_core.png)
+![电子开关核心](../images/circuit_01_switch_core.png)
 
 ### 分压网络
 
-![分压网络](images/circuit_01_divider.png)
+![分压网络](../images/circuit_01_divider.png)
 
 ### 分压比计算
 
@@ -184,7 +184,7 @@ $$
 
 ## 🎯 信号时序
 
-![控制时序](images/circuit_01_timing.png)
+![控制时序](../images/circuit_01_timing.png)
 
 | 阶段 | DO_UBCTRL | NPN | PNP | ADC |
 |:--|:--|:--|:--|:--|
@@ -284,7 +284,7 @@ A：改分压网络：R3005 → 68K（分压比 4.7/(68+4.7) ≈ 0.065），24V 
 
 ## 📊 系统框图
 
-![系统框图](images/circuit_01_block.png)
+![系统框图](../images/circuit_01_block.png)
 
 ---
 
