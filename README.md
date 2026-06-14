@@ -8,7 +8,7 @@
 
 | # | 电路模块 | 笔记 | 状态 |
 |:-:|:--|:--|:--:|
-| 1 | — | — | ⏳ 待添加 |
+| 1 | UBD1 电源检测 | [circuit_01_ubd1_power_detection.md](circuits/circuit_01_ubd1_power_detection.md) | ✅ 完成 |
 | 2 | — | — | ⏳ 待添加 |
 
 > 电路图由你拍摄 → 我整理笔记 + Python 重新绘制原理图 + 生成知识配图。
